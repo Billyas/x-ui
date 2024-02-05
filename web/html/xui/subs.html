@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+<style>
+    @media (min-width: 769px) {
+        .ant-layout-content {
+            margin: 24px 16px;
+        }
+    }
+
+    .ant-col-sm-24 {
+        margin-top: 10px;
+    }
+</style>
+<body>
+<a-layout id="app" v-cloak>
+    {{ template "commonSider" . }}
+    <a-layout id="content-layout">
+        <a-layout-content>
+            <a-spin :spinning="spinning" :delay="500" tip="loading">
+                <transition name="list" appear>
+                    <a-tag v-if="false" color="red" style="margin-bottom: 10px">
+                        Please go to the panel settings as soon as possible to modify the username and password, otherwise there may be a risk of leaking account information
+                    </a-tag>
+                </transition>
+                <transition name="list" appear>
+                    <a-card hoverable>
+                        <div slot="title">
+                            <a-button type="primary" icon="plus" @click="openAddSubs"></a-button>
+                        </div>
+                        <a-table :columns="columns" :row-key="dbSub => dbSub.id"
+                                 :data-source="dbSubs"
+                                 :loading="spinning"
+                                 :pagination="false"
+                                 style="margin-top: 20px"
+                                 @change="() => getDBSubs()">
+                            <template slot="action" slot-scope="text, dbSub">
+                                <a-dropdown :trigger="['click']">
+                                    <a @click="e => e.preventDefault()">操作</a>
+                                    <a-menu slot="overlay" @click="a => clickAction(a, dbSub)">
+                                        <a-menu-item v-if="dbSub.url" key="qrcode">
+                                            <a-icon type="qrcode"></a-icon>二维码
+                                        </a-menu-item>
+                                        <a-menu-item key="edit">
+                                            <a-icon type="edit"></a-icon>编辑
+                                        </a-menu-item>
+                                        <a-menu-item key="delete">
+                                            <span style="color: #FF4D4F">
+                                                <a-icon type="delete"></a-icon>删除
+                                            </span>
+                                        </a-menu-item>
+                                    </a-menu>
+                                </a-dropdown>
+                            </template>
+                        </a-table>
+                    </a-card>
+                </transition>
+            </a-spin>
+        </a-layout-content>
+    </a-layout>
+</a-layout>
+{{template "js" .}}
+<script>
+
+    const columns = [{
+        title: "操作",
+        align: 'center',
+        width: 10,
+        scopedSlots: { customRender: 'action' },
+    },  {
+        title: "Id",
+        align: 'center',
+        dataIndex: "id",
+        width: 10,
+    }, {
+        title: "名称",
+        align: 'center',
+        width: 10,
+        dataIndex: "name",
+    }, {
+        title: "类型",
+        align: 'center',
+        width: 10,
+        dataIndex: "type",
+    },  {
+        title: "URL",
+        align: 'center',
+        width: 80,
+        dataIndex: "url",
+    }];
+
+    const app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            siderDrawer,
+            spinning: false,
+            inbounds: [],
+            dbSubs: [],
+            subs: [],
+        },
+        methods: {
+            loading(spinning=true) {
+                this.spinning = spinning;
+            },
+            async getDBSubs() {
+                this.loading();
+                const msg = await HttpUtil.post('/xui/subs/list');
+                this.loading(false);
+                if (!msg.success) {
+                    return;
+                }
+                this.setSubs(msg.obj);
+            },
+            setSubs(dbSubs) {
+                this.dbSubs.splice(0);
+                for (const item of dbSubs) {
+                    const sub = new Sub(item)
+                    this.dbSubs.push(sub);
+                }
+                console.log(this.dbSubs)
+            },
+            searchInbounds(key) {
+                if (ObjectUtil.isEmpty(key)) {
+                    this.searchedInbounds = this.dbSubs.slice();
+                } else {
+                    this.searchedInbounds.splice(0, this.searchedInbounds.length);
+                    this.dbSubs.forEach(inbound => {
+                        if (ObjectUtil.deepSearch(inbound, key)) {
+                            this.searchedInbounds.push(inbound);
+                        }
+                    });
+                }
+            },
+            clickAction(action, dbSub) {
+                switch (action.key) {
+                    case "qrcode":
+                        this.showQrcode(dbSub);
+                        break;
+                    case "edit":
+                        this.openEditInbound(dbSub);
+                        break;
+                    case "delete":
+                        this.delSub(dbSub);
+                        break;
+                }
+            },
+            openAddSubs() {
+                suModal.show({
+                    title: '添加订阅',
+                    okText: '添加',
+                    confirm: async (sub) => {
+                        suModal.loading();
+                        await this.addSub(sub);
+                        suModal.close();
+                    }
+                });
+            },
+            openEditInbound(dbSub) {
+                suModal.show({
+                    title: '修改订阅',
+                    okText: '修改',
+                    sub: dbSub,
+                    confirm: async (sub) => {
+                        suModal.loading();
+                        await this.updateInbound(sub);
+                        suModal.close();
+                    }
+                });
+            },
+            async addSub(sub) {
+                console.log(sub)
+                const data = {
+                    name: sub.name,
+                    type: sub.type,
+                    url: sub.url,
+                };
+                await this.submit('/xui/subs/add', data, suModal);
+            },
+            async updateInbound(dbSub) {
+                const data = {
+                    name: dbSub.name,
+                    type: dbSub.type,
+                    url: dbSub.url,
+                };
+                await this.submit(`/xui/subs/update/${dbSub.id}`, data, suModal);
+            },
+            delSub(dbSub) {
+                this.$confirm({
+                    title: '删除入站',
+                    content: '确定要删除入站吗?',
+                    okText: '删除',
+                    cancelText: '取消',
+                    onOk: () => this.submit('/xui/subs/del/' + dbSub.id),
+                });
+            },
+            showQrcode(dbSub) {
+                const link = dbSub.url;
+                qrModal.show('二维码', link);
+            },
+            async submit(url, data, modal) {
+                const msg = await HttpUtil.postWithModal(url, data, modal);
+                if (msg.success) {
+                    await this.getDBSubs();
+                }
+            },
+        },
+        mounted() {
+            this.getDBSubs();
+        },
+        computed: {
+            total() {
+                let down = 0, up = 0;
+                for (let i = 0; i < this.dbSubs.length; ++i) {
+                    down += this.dbSubs[i].down;
+                    up += this.dbSubs[i].up;
+                }
+                return {
+                    down: down,
+                    up: up,
+                };
+            }
+        },
+    });
+
+</script>
+{{template "subsModal"}}
+{{template "promptModal"}}
+{{template "qrcodeModal"}}
+{{template "textModal"}}
+</body>
+</html>

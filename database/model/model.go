@@ -64,3 +64,19 @@ type Setting struct {
 	Key   string `json:"key" form:"key"`
 	Value string `json:"value" form:"value"`
 }
+
+type SubType string
+
+const (
+	SubURL  SubType = "SubURL"  // 订阅地址
+	OwnNode SubType = "OwnNode" // 自建节点
+	DynNode SubType = "DynNode" // 动态节点
+	FinData SubType = "FinData" // 生成数据
+)
+
+type Sub struct {
+	Id   int     `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
+	Type SubType `json:"type" form:"type"`
+	Name string  `json:"name" form:"name"`
+	Url  string  `json:"url" form:"url"`
+}

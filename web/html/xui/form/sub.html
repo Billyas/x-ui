@@ -1,0 +1,26 @@
+{{define "form/sub"}}
+<!-- base -->
+<a-form layout="inline">
+    <a-form-item>
+        <span slot="label">
+            名称
+            <a-tooltip>
+                <template slot="title">
+                    默认留空即可
+                </template>
+                <a-icon type="question-circle" theme="filled"></a-icon>
+            </a-tooltip>
+        </span>
+        <a-input v-model.trim="sub.name"></a-input>
+    </a-form-item>
+    <a-form-item label='类型'>
+        <a-select v-model="sub.type" style="width: 160px;">
+            <a-select-option v-for="p in SubType" :key="p" :value="p">[[ p ]]</a-select-option>
+        </a-select>
+    </a-form-item>
+    <a-form-item label="地址">
+        <a-input  v-model.number="sub.url"></a-input>
+    </a-form-item>
+</a-form>
+
+{{end}}

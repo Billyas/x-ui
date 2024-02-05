@@ -8,7 +8,12 @@ const Protocols = {
     SOCKS: 'socks',
     HTTP: 'http',
 };
-
+const SubType = {
+    SubURL: "SubURL",
+    OwnNode: "OwnNode",
+    DynNode: "DynNode",
+    FinData: "FinData",
+}
 const VmessMethods = {
     AES_128_GCM: 'aes-128-gcm',
     CHACHA20_POLY1305: 'chacha20-poly1305',

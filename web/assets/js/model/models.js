@@ -155,6 +155,20 @@ class DBInbound {
     }
 }
 
+class Sub {
+    constructor(data) {
+        this.id =  0;
+        this.type = SubType.SubURL;
+        this.name = "";
+        this.url = "";
+        if (data == null) {
+            return;
+        }
+        ObjectUtil.cloneProps(this, data);
+    }
+
+}
+
 class AllSetting {
 
     constructor(data) {

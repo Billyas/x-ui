@@ -41,6 +41,10 @@ func initSetting() error {
 	return db.AutoMigrate(&model.Setting{})
 }
 
+func initSub() error {
+	return db.AutoMigrate(&model.Sub{})
+}
+
 func InitDB(dbPath string) error {
 	dir := path.Dir(dbPath)
 	err := os.MkdirAll(dir, fs.ModeDir)
@@ -73,6 +77,10 @@ func InitDB(dbPath string) error {
 		return err
 	}
 	err = initSetting()
+	if err != nil {
+		return err
+	}
+	err = initSub()
 	if err != nil {
 		return err
 	}

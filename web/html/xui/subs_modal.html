@@ -1,0 +1,58 @@
+{{define "subsModal"}}
+<a-modal id="subs-modal" v-model="suModal.visible" :title="suModal.title" @ok="suModal.ok"
+         :confirm-loading="suModal.confirmLoading" :closable="true" :mask-closable="false"
+         :ok-text="suModal.okText" cancel-text='{{ i18n "close" }}'>
+    {{template "form/sub"}}
+</a-modal>
+<script>
+
+    const suModal = {
+        title: '',
+        visible: false,
+        confirmLoading: false,
+        okText: '确定',
+        confirm: null,
+        inbound: new Inbound(),
+        dbInbound: new DBInbound(),
+        subs: new Sub(),
+        ok() {
+            ObjectUtil.execute(suModal.confirm, suModal.subs);
+        },
+        show({ title='', okText='确定', sub=null, confirm=(sub)=>{} }) {
+            this.title = title;
+            this.okText = okText;
+            if (sub) {
+                this.subs = new Sub(sub);
+            } else {
+                this.subs = new Sub();
+            }
+            this.confirm = confirm;
+            this.visible = true;
+        },
+        close() {
+            suModal.visible = false;
+            suModal.loading(false);
+        },
+        loading(loading) {
+            suModal.confirmLoading = loading;
+        },
+    };
+
+
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#subs-modal',
+        data: {
+            suModal: suModal,
+            SubType: SubType,
+            get sub() {
+                return suModal.subs;
+            },
+        },
+        methods: {
+
+        }
+    });
+
+</script>
+{{end}}
