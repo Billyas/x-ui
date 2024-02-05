@@ -1,16 +1,7 @@
 {{define "form/sub"}}
 <!-- base -->
 <a-form layout="inline">
-    <a-form-item>
-        <span slot="label">
-            名称
-            <a-tooltip>
-                <template slot="title">
-                    默认留空即可
-                </template>
-                <a-icon type="question-circle" theme="filled"></a-icon>
-            </a-tooltip>
-        </span>
+    <a-form-item label="名称">
         <a-input v-model.trim="sub.name"></a-input>
     </a-form-item>
     <a-form-item label='类型'>
@@ -19,7 +10,7 @@
         </a-select>
     </a-form-item>
     <a-form-item label="地址">
-        <a-input  v-model.number="sub.url"></a-input>
+        <a-textarea v-model.trim="sub.url" style="width: 450px"  :auto-size="{ minRows: 4, maxRows: 16 }"></a-textarea>
     </a-form-item>
 </a-form>
 
