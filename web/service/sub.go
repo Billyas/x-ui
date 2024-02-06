@@ -27,6 +27,15 @@ func (s *SubService) GetSubsByType(subType string) ([]*model.Sub, error) {
 	}
 	return subs, nil
 }
+func (s *SubService) GetSubsBySubType(subType model.SubType) ([]*model.Sub, error) {
+	db := database.GetDB()
+	var subs []*model.Sub
+	err := db.Model(model.Sub{}).Where("type = ?", string(subType)).Find(&subs).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	return subs, nil
+}
 func (s *SubService) AddSub(sub *model.Sub) error {
 	db := database.GetDB()
 	return db.Create(sub).Error

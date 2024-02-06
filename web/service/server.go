@@ -18,7 +18,6 @@ import (
 	"runtime"
 	"time"
 	"x-ui/logger"
-	"x-ui/util/sys"
 	"x-ui/xray"
 )
 
@@ -143,12 +142,14 @@ func (s *ServerService) GetStatus(lastStatus *Status) *Status {
 		logger.Warning("can not find io counters")
 	}
 
-	status.TcpCount, err = sys.GetTCPCount()
+	//status.TcpCount, err = sys.GetTCPCount()
+	status.TcpCount = 0 //win下不支持
 	if err != nil {
 		logger.Warning("get tcp connections failed:", err)
 	}
 
-	status.UdpCount, err = sys.GetUDPCount()
+	//status.UdpCount, err = sys.GetUDPCount()
+	status.UdpCount = 0 //win下不支持
 	if err != nil {
 		logger.Warning("get udp connections failed:", err)
 	}
