@@ -87,6 +87,7 @@
         align: 'center',
         width: 80,
         dataIndex: "url",
+        ellipsis: true,
     }];
 
     const app = new Vue({
@@ -174,6 +175,7 @@
                     name: sub.name,
                     type: sub.type,
                     url: sub.url,
+                    id: sub.id
                 };
                 await this.submit('/xui/subs/add', data, suModal);
             },
@@ -182,6 +184,7 @@
                     name: dbSub.name,
                     type: dbSub.type,
                     url: dbSub.url,
+                    id: dbSub.id
                 };
                 await this.submit(`/xui/subs/update/${dbSub.id}`, data, suModal);
             },

@@ -1,8 +1,8 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,12 +16,11 @@ type Info struct {
 }
 
 type Response struct {
-	Code string `json:"code"`
+	Code int    `json:"code"`
 	Info []Info `json:"info"`
 }
 
-func (s *GetSubService) GetLatestCFNodeProxy() (string, error) {
-	fmt.Println("执行CFNode定时器")
+func (s *GetSubService) GetLatestCFNode() (string, error) {
 	var cfNodes strings.Builder
 
 	// 1. 数据库查找模版链接
@@ -32,7 +31,9 @@ func (s *GetSubService) GetLatestCFNodeProxy() (string, error) {
 
 	// 2. 请求CF节点列表
 	requestUrl := "https://api.hostmonit.com/get_optimization_ip"
-	params := "{\"key\":\"iDetkOys\"}"
+	params := map[string]string{
+		"key": "iDetkOys",
+	}
 	headers := map[string]string{
 		"authority":    "api.hostmonit.com",
 		"pragma":       "no-cache",
@@ -50,14 +51,16 @@ func (s *GetSubService) GetLatestCFNodeProxy() (string, error) {
 	}
 
 	ipLines := make(map[string][]string)
-
+	// 将 params 转换为 JSON
+	jsonParams, _ := json.Marshal(params)
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", requestUrl, strings.NewReader(params))
+	req, _ := http.NewRequest("POST", requestUrl, bytes.NewBuffer(jsonParams))
 	for key, value := range headers {
 		req.Header.Add(key, value)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
+		println(err.Error())
 		return "", err
 	}
 	defer func(Body io.ReadCloser) {
@@ -71,10 +74,11 @@ func (s *GetSubService) GetLatestCFNodeProxy() (string, error) {
 	var response Response
 	err = json.Unmarshal(body, &response)
 	if err != nil {
+		println(err.Error())
 		return "", err
 	}
 
-	if response.Code == "200" {
+	if response.Code == 200 {
 		for _, info := range response.Info {
 			ip := info.Ip
 			line := url.QueryEscape(lineMap[info.Line])
@@ -87,7 +91,8 @@ func (s *GetSubService) GetLatestCFNodeProxy() (string, error) {
 		templateUrl := subTemplate.Url
 		for line, ips := range ipLines {
 			for _, ip := range ips {
-				cfNode := fmt.Sprintf(templateUrl, ip, line)
+				cfNode := strings.Replace(templateUrl, "{0}", ip, -1)
+				cfNode = strings.Replace(cfNode, "{1}", line, -1)
 				cfNodes.WriteString(cfNode + "\n")
 			}
 		}

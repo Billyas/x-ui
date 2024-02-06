@@ -1,6 +1,10 @@
 {{define "form/sub"}}
 <!-- base -->
 <a-form layout="inline">
+    <a-form-item label="&emsp;Id">
+        <a-input v-model.number="sub.id"></a-input>
+    </a-form-item>
+    <br/>
     <a-form-item label="名称">
         <a-input v-model.trim="sub.name"></a-input>
     </a-form-item>

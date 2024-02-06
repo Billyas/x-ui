@@ -2,13 +2,15 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strconv"
 	"x-ui/database/model"
 	"x-ui/web/service"
 )
 
 type SubController struct {
-	subService service.SubService
+	subService   service.SubService
+	getSubSevice service.GetSubService
 }
 
 func NewSubController(g *gin.RouterGroup) *SubController {
@@ -24,6 +26,8 @@ func (a *SubController) initRouter(g *gin.RouterGroup) {
 	g.POST("/add", a.addSub)
 	g.POST("/del/:id", a.delSub)
 	g.POST("/update/:id", a.updateSub)
+	g.GET("/getCfNode", a.getCfNode)
+	g.GET("/getSubNode", a.getSubNode)
 }
 
 func (a *SubController) getSubs(c *gin.Context) {
@@ -73,4 +77,20 @@ func (a *SubController) updateSub(c *gin.Context) {
 	}
 	err = a.subService.UpdateSub(sub)
 	jsonMsg(c, "修改", err)
+}
+
+func (a *SubController) getCfNode(c *gin.Context) {
+	node, err := a.getSubSevice.GetLatestCFNode()
+	if err != nil {
+		return
+	}
+	c.String(http.StatusOK, node)
+}
+
+func (a *SubController) getSubNode(c *gin.Context) {
+	proxy, err := a.getSubSevice.GetLatestUrlSub()
+	if err != nil {
+		return
+	}
+	c.String(http.StatusOK, proxy)
 }
