@@ -94,8 +94,3 @@ func (a *SubController) getSubNode(c *gin.Context) {
 	}
 	c.String(http.StatusOK, proxy)
 }
-
-func (a *SubController) getSubscribe(c *gin.Context) {
-	subscribe := a.subService.GetSubsById(10).Url
-	c.String(http.StatusOK, subscribe)
-}

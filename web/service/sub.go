@@ -43,7 +43,19 @@ func (s *SubService) GetSubsById(id int) model.Sub {
 	db.First(&sub, id)
 	return sub
 }
-
+func (s *SubService) GetSubsByIdType(id int) model.Sub {
+	db := database.GetDB()
+	//根据id与type查找Sub
+	var sub model.Sub
+	db.Where("id = ? AND type = ?", id, model.FinData).First(&sub)
+	return sub
+}
+func (s *SubService) GetAESKey() model.Sub {
+	db := database.GetDB()
+	var key model.Sub
+	db.Where("type = ?", model.AESKEY).First(&key)
+	return key
+}
 func (s *SubService) AddSub(sub *model.Sub) error {
 	db := database.GetDB()
 	return db.Create(sub).Error

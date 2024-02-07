@@ -13,6 +13,7 @@ const SubType = {
     OwnNode: "OwnNode",
     DynNode: "DynNode",
     FinData: "FinData",
+    AESKEY: "AESKEY",
 }
 const VmessMethods = {
     AES_128_GCM: 'aes-128-gcm',

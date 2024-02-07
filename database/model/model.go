@@ -72,6 +72,7 @@ const (
 	OwnNode SubType = "OwnNode" // 自建节点
 	DynNode SubType = "DynNode" // 动态节点
 	FinData SubType = "FinData" // 生成数据
+	AESKEY  SubType = "AESKEY"  // AES加密
 )
 
 type Sub struct {
