@@ -28,6 +28,7 @@ func (a *SubController) initRouter(g *gin.RouterGroup) {
 	g.POST("/update/:id", a.updateSub)
 	g.GET("/getCfNode", a.getCfNode)
 	g.GET("/getSubNode", a.getSubNode)
+	g.POST("/getSubNode", a.getSubNode)
 }
 
 func (a *SubController) getSubs(c *gin.Context) {
@@ -88,9 +89,11 @@ func (a *SubController) getCfNode(c *gin.Context) {
 }
 
 func (a *SubController) getSubNode(c *gin.Context) {
-	proxy, err := a.getSubSevice.GetLatestUrlSub()
+	_, err := a.getSubSevice.GetLatestUrlSub()
+	//c.String(http.StatusOK, proxy)
 	if err != nil {
+		jsonMsg(c, "更新", err)
 		return
 	}
-	c.String(http.StatusOK, proxy)
+	jsonMsg(c, "更新", err)
 }

@@ -27,6 +27,7 @@
                     <a-card hoverable>
                         <div slot="title">
                             <a-button type="primary" icon="plus" @click="openAddSubs"></a-button>
+                            <a-button type="default" icon="retweet" @click="crawSubs"></a-button>
                         </div>
                         <a-table :columns="columns" :row-key="dbSub => dbSub.id"
                                  :data-source="dbSubs"
@@ -47,6 +48,11 @@
                                         <a-menu-item key="delete">
                                             <span style="color: #FF4D4F">
                                                 <a-icon type="delete"></a-icon>删除
+                                            </span>
+                                        </a-menu-item>
+                                        <a-menu-item key="craw">
+                                            <span style="color: #51b06a">
+                                                <a-icon type="download"></a-icon>更新
                                             </span>
                                         </a-menu-item>
                                     </a-menu>
@@ -144,6 +150,9 @@
                     case "delete":
                         this.delSub(dbSub);
                         break;
+                    case "craw":
+                        this.crawSubs();
+                        break;
                 }
             },
             openAddSubs() {
@@ -200,6 +209,15 @@
             showQrcode(dbSub) {
                 const link = dbSub.url;
                 qrModal.show('二维码', link);
+            },
+            crawSubs() {
+                this.$confirm({
+                    title: '立即拉取订阅',
+                    content: '确定要拉取订阅吗?',
+                    okText: '拉取',
+                    cancelText: '取消',
+                    onOk: () => this.submit('/xui/subs/getSubNode'),
+                });
             },
             async submit(url, data, modal) {
                 const msg = await HttpUtil.postWithModal(url, data, modal);
