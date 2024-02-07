@@ -36,6 +36,14 @@ func (s *SubService) GetSubsBySubType(subType model.SubType) ([]*model.Sub, erro
 	}
 	return subs, nil
 }
+func (s *SubService) GetSubsById(id int) model.Sub {
+	db := database.GetDB()
+	//根据id查找Sub
+	var sub model.Sub
+	db.First(&sub, id)
+	return sub
+}
+
 func (s *SubService) AddSub(sub *model.Sub) error {
 	db := database.GetDB()
 	return db.Create(sub).Error

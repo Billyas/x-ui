@@ -294,6 +294,9 @@ func (s *Server) startTask() {
 
 	// 每 30 秒检查一次 inbound 流量超出和到期的情况
 	s.cron.AddJob("@every 30s", job.NewCheckInboundJob())
+
+	// 每隔两个分钟执行一次 拉取最新的订阅
+	s.cron.AddJob("@every 2h", job.NewGetSubsJob())
 }
 
 func (s *Server) Start() (err error) {
