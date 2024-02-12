@@ -48,6 +48,7 @@ func (s *GetSubService) GetLatestUrlSub() (string, error) {
 	}
 	for _, node := range nodes {
 		stringBuilder.WriteString(node.Url)
+		stringBuilder.WriteString("\n")
 	}
 
 	// 3. 添加CFNode内容
