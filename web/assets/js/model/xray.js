@@ -14,6 +14,8 @@ const SubType = {
     DynNode: "动态",
     FinData: "缓存",
     AESKEY: "密钥",
+    DownNode: "停用",
+    FistNode: "首选",
 }
 const VmessMethods = {
     AES_128_GCM: 'aes-128-gcm',

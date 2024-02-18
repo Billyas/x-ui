@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"x-ui/database/model"
+	"x-ui/logger"
 )
 
 type GetSubService struct {
@@ -14,41 +15,59 @@ type GetSubService struct {
 
 func (s *GetSubService) GetLatestUrlSub() (string, error) {
 	var stringBuilder strings.Builder
+	// 0. 如果存在首选节点先添加
+	firstNode, err := s.subService.GetSubsBySubType(model.FistNode)
+	// 如果存在首选节点则添加,不存在执行下面的操作
+	if err == nil && len(firstNode) > 0 {
+		for _, node := range firstNode {
+			stringBuilder.WriteString(node.Url)
+			stringBuilder.WriteString("\n")
+		}
+	} else if err != nil {
+		logger.Errorf("步骤0：" + err.Error())
+	}
 
 	// 1. 对所有订阅进行HTTP请求并解码base64响应
 	subs, err := s.subService.GetSubsBySubType(model.SubURL)
-	if err != nil {
-		return "", err
-	}
-	for _, sub := range subs {
-		response, err := http.Get(sub.Url)
-		if err != nil {
-			println(err.Error())
-			return "", err
-		}
-		defer response.Body.Close()
 
-		body, err := io.ReadAll(response.Body)
-		if err != nil {
-			return "", err
-		}
+	if err == nil && len(subs) > 0 {
+		for _, sub := range subs {
+			response, err := http.Get(sub.Url)
+			if err != nil {
+				logger.Errorf(err.Error())
+				continue
+			}
 
-		subStr, err := base64.StdEncoding.DecodeString(string(body))
-		if err != nil {
-			return "", err
-		}
+			defer response.Body.Close()
 
-		stringBuilder.WriteString(string(subStr))
+			body, err := io.ReadAll(response.Body)
+			if err != nil {
+				logger.Errorf(err.Error())
+				continue
+			}
+
+			subStr, err := base64.StdEncoding.DecodeString(string(body))
+			if err != nil {
+				logger.Errorf(err.Error())
+				continue
+			}
+
+			stringBuilder.WriteString(string(subStr))
+		}
+	} else if err != nil {
+		logger.Errorf("步骤1：" + err.Error())
 	}
 
 	// 2. 获取自定义节点并将其添加到订阅内容中
 	nodes, err := s.subService.GetSubsBySubType(model.OwnNode)
-	if err != nil {
-		return "", err
-	}
-	for _, node := range nodes {
-		stringBuilder.WriteString(node.Url)
-		stringBuilder.WriteString("\n")
+
+	if err == nil && len(nodes) > 0 {
+		for _, node := range nodes {
+			stringBuilder.WriteString(node.Url)
+			stringBuilder.WriteString("\n")
+		}
+	} else if err != nil {
+		logger.Errorf("步骤2：" + err.Error())
 	}
 
 	// 3. 添加CFNode内容

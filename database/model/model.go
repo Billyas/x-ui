@@ -68,11 +68,13 @@ type Setting struct {
 type SubType string
 
 const (
-	SubURL  SubType = "订阅" // 订阅地址
-	OwnNode SubType = "自建" // 自建节点
-	DynNode SubType = "动态" // 动态节点
-	FinData SubType = "缓存" // 生成数据
-	AESKEY  SubType = "密钥" // AES加密
+	SubURL   SubType = "订阅" // 订阅地址
+	OwnNode  SubType = "自建" // 自建节点
+	DynNode  SubType = "动态" // 动态节点
+	FinData  SubType = "缓存" // 生成数据
+	AESKEY   SubType = "密钥" // AES加密
+	DownNode SubType = "停用" // 停用节点
+	FistNode SubType = "首选" // 首选节点
 )
 
 type Sub struct {
