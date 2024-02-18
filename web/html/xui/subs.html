@@ -23,11 +23,27 @@
                         Please go to the panel settings as soon as possible to modify the username and password, otherwise there may be a risk of leaking account information
                     </a-tag>
                 </transition>
+<!--                <transition name="list" appear>-->
+<!--                    <a-card hoverable style="margin-bottom: 20px;">-->
+<!--                        <a-form layout="inline">-->
+<!--                            <a-form-item label='类型'>-->
+<!--                                <a-select v-model="search.type" style="width: 160px;">-->
+<!--                                    <a-select-option v-for="p in SubType" :key="p" :value="p">[[ p ]]</a-select-option>-->
+<!--                                </a-select>-->
+<!--                            </a-form-item>-->
+<!--                        </a-form>-->
+<!--                    </a-card>-->
+<!--                </transition>-->
                 <transition name="list" appear>
                     <a-card hoverable>
                         <div slot="title">
                             <a-button type="primary" icon="plus" @click="openAddSubs"></a-button>
                             <a-button type="default" icon="retweet" @click="crawSubs"></a-button>
+
+                            <a-select v-model="search.type"  style="width: 160px; float: right" @change="searchSubs">
+                                <a-select-option v-for="p in SubType" :key="p" :value="p">[[ p ]]</a-select-option>
+                            </a-select>
+
                         </div>
                         <a-table :columns="columns" :row-key="dbSub => dbSub.id"
                                  :data-source="dbSubs"
@@ -105,6 +121,9 @@
             inbounds: [],
             dbSubs: [],
             subs: [],
+            search: {
+                type: '',
+            },
         },
         methods: {
             loading(spinning=true) {
@@ -125,7 +144,15 @@
                     const sub = new Sub(item)
                     this.dbSubs.push(sub);
                 }
-                console.log(this.dbSubs)
+            },
+            async searchSubs(){
+                this.loading();
+                const msg = await HttpUtil.post('/xui/subs/getSubByType', this.search);
+                this.loading(false);
+                if (!msg.success) {
+                    return;
+                }
+                this.setSubs(msg.obj);
             },
             searchInbounds(key) {
                 if (ObjectUtil.isEmpty(key)) {

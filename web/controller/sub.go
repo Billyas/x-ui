@@ -26,6 +26,7 @@ func (a *SubController) initRouter(g *gin.RouterGroup) {
 	g.POST("/add", a.addSub)
 	g.POST("/del/:id", a.delSub)
 	g.POST("/update/:id", a.updateSub)
+	g.POST("/getSubByType", a.getSubByType)
 	g.GET("/getCfNode", a.getCfNode)
 	g.GET("/getSubNode", a.getSubNode)
 	g.POST("/getSubNode", a.getSubNode)
@@ -78,6 +79,15 @@ func (a *SubController) updateSub(c *gin.Context) {
 	}
 	err = a.subService.UpdateSub(sub)
 	jsonMsg(c, "修改", err)
+}
+func (a *SubController) getSubByType(c *gin.Context) {
+	subType := c.PostForm("type")
+	subs, err := a.subService.GetSubsByType(subType)
+	if err != nil {
+		jsonMsg(c, "获取", err)
+		return
+	}
+	jsonObj(c, subs, nil)
 }
 
 func (a *SubController) getCfNode(c *gin.Context) {
