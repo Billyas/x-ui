@@ -9,13 +9,13 @@ const Protocols = {
     HTTP: 'http',
 };
 const SubType = {
-    SubURL: "订阅",
-    OwnNode: "自建",
-    DynNode: "动态",
-    FinData: "缓存",
-    AESKEY: "密钥",
-    DownNode: "停用",
-    FistNode: "首选",
+    SubURL: "订阅🙂",
+    OwnNode: "自建😃",
+    DynNode: "动态😛",
+    FinData: "缓存😶",
+    AESKEY: "密钥🗝",
+    DownNode: "停用🛑",
+    FistNode: "首选🚀",
 }
 const VmessMethods = {
     AES_128_GCM: 'aes-128-gcm',
