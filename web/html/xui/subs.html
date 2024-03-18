@@ -243,13 +243,19 @@
                     content: '确定要拉取订阅吗?',
                     okText: '拉取',
                     cancelText: '取消',
-                    onOk: () => this.submit('/xui/subs/getSubNode'),
+                    onOk: () => this.submitType('/xui/subs/getSubNode'),
                 });
             },
             async submit(url, data, modal) {
                 const msg = await HttpUtil.postWithModal(url, data, modal);
                 if (msg.success) {
                     await this.getDBSubs();
+                }
+            },
+            async submitType(url, data, modal) {
+                const msg = await HttpUtil.postWithModal(url, data, modal);
+                if (msg.success) {
+                    await this.searchSubs();
                 }
             },
         },
