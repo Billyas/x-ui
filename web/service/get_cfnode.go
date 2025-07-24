@@ -28,6 +28,10 @@ func (s *GetSubService) GetLatestCFNode() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// 如果没有找到动态节点，直接返回空结果
+	if len(dynodes) == 0 {
+		return "", nil
+	}
 
 	// 2. 请求CF节点列表
 	requestUrl := "https://api.hostmonit.com/get_optimization_ip"
