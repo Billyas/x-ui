@@ -67,6 +67,7 @@ func (s *GetSubService) GetLatestUrlSub() (string, error) {
 	            }
 	
 	            stringBuilder.WriteString(string(subStr))
+		    stringBuilder.WriteString("\n")
 	        }
 	    } else if err != nil {
 	        logger.Errorf("步骤1：" + err.Error())
