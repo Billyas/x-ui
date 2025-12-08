@@ -75,6 +75,7 @@ const (
 	AESKEY   SubType = "密钥🗝" // AES加密
 	DownNode SubType = "停用🛑" // 停用节点
 	FistNode SubType = "首选🚀" // 首选节点
+	ExcludeNode SubType = "排除🔴" // 排除节点
 )
 
 type Sub struct {

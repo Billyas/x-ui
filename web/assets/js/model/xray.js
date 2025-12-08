@@ -16,6 +16,7 @@ const SubType = {
     AESKEY: "密钥🗝",
     DownNode: "停用🛑",
     FistNode: "首选🚀",
+    ExcludeNode: "排除🔴",
 }
 const VmessMethods = {
     AES_128_GCM: 'aes-128-gcm',
