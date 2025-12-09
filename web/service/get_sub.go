@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
@@ -171,9 +172,13 @@ func (s *GetSubService) shouldExcludeNode(nodeUrl string, excludePatterns []stri
 }
 
 // extractNodeRemark 从节点URL中提取备注
-// 所有节点格式都是 协议://其他信息#名称，直接提取#后面的内容并进行URL解码
 func (s *GetSubService) extractNodeRemark(nodeUrl string) string {
-	// 查找#的位置
+	// 特殊处理VMess协议
+	if strings.HasPrefix(nodeUrl, "vmess://") {
+		return s.extractVMessRemark(nodeUrl)
+	}
+
+	// 其他协议：协议://其他信息#名称，直接提取#后面的内容并进行URL解码
 	remarkIndex := strings.Index(nodeUrl, "#")
 	if remarkIndex == -1 {
 		// 没有#，无法提取备注
@@ -189,6 +194,44 @@ func (s *GetSubService) extractNodeRemark(nodeUrl string) string {
 	}
 
 	return decodedRemark
+}
+
+// extractVMessRemark 从VMess链接中提取备注
+func (s *GetSubService) extractVMessRemark(vmessUrl string) string {
+	// 去除vmess://前缀
+	vmessData := strings.TrimPrefix(vmessUrl, "vmess://")
+
+	// 尝试使用标准base64解码
+	decoded, err := base64.StdEncoding.DecodeString(vmessData)
+	if err != nil {
+		// 尝试使用URL安全的base64解码
+		vmessData = strings.ReplaceAll(vmessData, "-", "+")
+		vmessData = strings.ReplaceAll(vmessData, "_", "/")
+		// 补全padding
+		padding := len(vmessData) % 4
+		if padding > 0 {
+			vmessData += strings.Repeat("=", 4-padding)
+		}
+		decoded, err = base64.StdEncoding.DecodeString(vmessData)
+		if err != nil {
+			// 解码失败，无法提取备注
+			return ""
+		}
+	}
+
+	// 解析JSON，提取ps字段
+	var vmessInfo map[string]interface{}
+	err = json.Unmarshal(decoded, &vmessInfo)
+	if err != nil {
+		return ""
+	}
+
+	// 获取ps字段（节点名称）
+	if ps, ok := vmessInfo["ps"].(string); ok {
+		return ps
+	}
+
+	return ""
 }
 
 // splitByMultipleDelimiters 按多种分隔符分割字符串
