@@ -60,7 +60,7 @@ func (s *GetSubService) GetLatestUrlSub() (string, error) {
 				continue
 			}
 
-			req.Header.Set("User-Agent", "V2rayN/5.0.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+			req.Header.Set("User-Agent", "V2rayN/7.16.6 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
 
 			response, err := client.Do(req)
 			if err != nil {
